@@ -59,7 +59,7 @@ textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var
 .mz{stroke:var(--sf);stroke-width:1.2;cursor:pointer}
 .m0{fill:var(--ln);background:var(--ln)}.m1{fill:#e5484d;background:#e5484d}.m2{fill:#f0a020;background:#f0a020}.m3{fill:#2fa866;background:#2fa866}.m4{fill:var(--ac);background:var(--ac)}
 .dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-.mm{width:100%;max-width:440px;display:block;margin:6px auto}.mt{margin-top:8px}
+.mm{width:100%;max-width:520px;display:block;margin:6px auto}.mt{margin-top:8px}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -185,32 +185,48 @@ function progV(){
  ${open===l.id?l.ex.map(e=>`<div style="margin-top:8px"><b>${esc(e.name)}</b>${e.sets.map((s,j)=>`<div class="mu">Set ${j+1}: ${esc(s.r)} rep × ${esc(s.w)} Kg</div>`).join("")}</div>`).join("")+`<button class="dg" data-a="ldel" data-id="${l.id}" style="margin-top:8px">${lab("l"+l.id,"Xoá buổi này")}</button>`:""}</div>`).join(""):`<div class="card mu">Nhật ký trống.</div>`}
  <h2 style="margin-top:18px">Sao lưu dữ liệu</h2><div class="card"><div class="mu">Tải file về rồi lưu vào Google Drive của bạn làm bản sao lưu, hoặc nhập file đó trên thiết bị khác để gộp dữ liệu.</div><div class="row" style="margin-top:8px"><button data-a="exp" style="flex:1">Tải file sao lưu</button><button data-a="imp" style="flex:1">Nhập file sao lưu</button></div><input type="file" id="imp" accept=".json,.txt,application/json,text/plain" hidden></div>`;
 }
-const MU={chest:"Ngực",shoulders:"Vai",biceps:"Tay trước",triceps:"Tay sau",forearms:"Cẳng tay",abs:"Bụng",quads:"Đùi trước",back:"Lưng",lowerback:"Lưng dưới",glutes:"Mông",hamstrings:"Đùi sau",calves:"Bắp chân"};
-const SUG={chest:["Bench Press","Incline Dumbbell Press"],shoulders:["Overhead Press","Lateral Raise"],biceps:["Bicep Curl","Hammer Curl"],triceps:["Triceps Pushdown","Dip"],forearms:["Wrist Curl","Farmer Walk"],abs:["Hanging Leg Raise","Plank"],quads:["Squat","Leg Press"],back:["Pull Up","Barbell Row"],lowerback:["Back Extension","Deadlift"],glutes:["Hip Thrust","Romanian Deadlift"],hamstrings:["Leg Curl","Romanian Deadlift"],calves:["Standing Calf Raise"]};
+const MU={neck:"Cổ",traps:"Cơ thang",delt_front:"Vai trước",delt_side:"Vai giữa",delt_rear:"Vai sau",chest:"Ngực",serratus:"Cơ răng cưa",biceps:"Tay trước (nhị đầu)",brachialis:"Cơ cánh tay (brachialis)",forearm_f:"Cẳng tay trong",forearm_e:"Cẳng tay ngoài",abs:"Cơ thẳng bụng",obliques:"Bụng chéo",adductors:"Đùi trong",quad_rf:"Đùi trước giữa",quad_vl:"Đùi trước ngoài",quad_vm:"Đùi trước trong",tibialis:"Cẳng chân trước",rotator:"Cơ xoay vai / teres",rhomboid:"Cơ trám",lats:"Cơ xô (lats)",erector:"Lưng dưới",triceps_long:"Tay sau - đầu dài",triceps_lat:"Tay sau - đầu ngoài",glutes_max:"Mông lớn",glutes_med:"Mông nhỡ",ham_out:"Đùi sau ngoài",ham_in:"Đùi sau trong",gastro:"Bắp chân (gastrocnemius)",soleus:"Cơ dép (soleus)"};
+const SM=new Set(["neck","serratus","brachialis","tibialis","forearm_f","forearm_e","rotator","adductors","glutes_med"]);
+const SUG={neck:["Neck Curl","Neck Extension"],traps:["Shrug","Face Pull"],delt_front:["Overhead Press","Front Raise"],delt_side:["Lateral Raise","Upright Row"],delt_rear:["Face Pull","Reverse Fly"],chest:["Bench Press","Incline Dumbbell Press"],serratus:["Push Up Plus","Landmine Press"],biceps:["Bicep Curl","Incline Curl"],brachialis:["Hammer Curl","Reverse Curl"],forearm_f:["Wrist Curl","Farmer Walk"],forearm_e:["Reverse Wrist Curl","Reverse Curl"],abs:["Hanging Leg Raise","Cable Crunch"],obliques:["Russian Twist","Side Plank"],adductors:["Adductor Machine","Sumo Squat"],quad_rf:["Leg Extension","Sissy Squat"],quad_vl:["Squat","Hack Squat"],quad_vm:["Leg Press","Front Squat"],tibialis:["Tibialis Raise"],rotator:["Face Pull","External Rotation"],rhomboid:["Seated Row","Barbell Row"],lats:["Pull Up","Lat Pulldown"],erector:["Back Extension","Deadlift"],triceps_long:["Overhead Triceps Extension","Skull Crusher"],triceps_lat:["Triceps Pushdown","Dip"],glutes_max:["Hip Thrust","Romanian Deadlift"],glutes_med:["Hip Abduction","Side Lying Leg Raise"],ham_out:["Leg Curl","Romanian Deadlift"],ham_in:["Seated Leg Curl","Stiff Leg Deadlift"],gastro:["Standing Calf Raise"],soleus:["Seated Calf Raise"]};
 const SL=["Chưa tập","Thiếu nhiều","Hơi thiếu","Đủ","Nhiều"];
-const lvl=v=>v<=0?0:v<5?1:v<10?2:v<=20?3:4;
+const lvl=(v,k)=>{const f=SM.has(k)?.4:.6;return v<=0?0:v<5*f?1:v<10*f?2:v<=20*f?3:4};
 const f1=v=>(Math.round(v*10)/10).toLocaleString("vi-VN");
 const norm=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").toLowerCase();
 /* [mẫu tên bài, nhóm cơ chính (1 set), nhóm cơ phụ (0,5 set)] - xét từ trên xuống, khớp đầu tiên thì dừng */
 const RU=[
- [/wrist|forearm|farmer|grip strength|hand grip|cang tay/,["forearms"],[]],
- [/tricep|push ?down|skull|french press|jm press|close grip|tay sau/,["triceps"],["chest","shoulders"]],
- [/leg curl|hamstring curl|nordic|lying curl|seated curl|dui sau/,["hamstrings"],["glutes"]],
- [/romanian|\brdl\b|stiff|good ?morning/,["hamstrings","glutes"],["lowerback"]],
- [/deadlift|rack pull|hex bar|keo dat/,["hamstrings","glutes","lowerback"],["back","forearms","quads"]],
- [/hip thrust|glute|kick ?back|donkey|\bmong\b/,["glutes"],["hamstrings"]],
- [/calf|calves|bap chan/,["calves"],[]],
- [/leg extension|sissy|dui truoc/,["quads"],[]],
- [/squat|leg press|hack|lunge|step ?up|day chan|ganh/,["quads","glutes"],["hamstrings"]],
- [/back extension|hyperextension|superman|lung duoi/,["lowerback"],["glutes"]],
- [/\bdips?\b/,["triceps","chest"],["shoulders"]],
- [/curl|bicep|hammer|preacher|tay truoc/,["biceps"],["forearms"]],
- [/face pull|rear delt|reverse fl|vai sau/,["shoulders"],["back"]],
- [/lateral|side raise|front raise|upright|\bvai\b/,["shoulders"],[]],
- [/overhead press|military|shoulder press|\bohp\b|push press|arnold/,["shoulders"],["triceps"]],
- [/pull ?up|chin ?up|pulldown|pull down|row|shrug|pullover|\blung\b|xa don|keo xa/,["back"],["biceps"]],
- [/bench|chest|\bpec|\bfly|flye|crossover|push ?up|incline|decline|nguc|hit dat/,["chest"],["shoulders","triceps"]],
- [/crunch|sit ?up|plank|leg raise|knee raise|ab wheel|rollout|russian twist|bung|\bcore\b|mountain climber/,["abs"],[]]
+ [/neck|nape|co gay/,["neck"],["traps"]],
+ [/tibialis|toe raise|shin raise/,["tibialis"],[]],
+ [/wrist|forearm|farmer|grip strength|hand grip|cang tay/,["forearm_f","forearm_e"],[]],
+ [/overhead tricep|french press|skull|jm press|overhead extension|tay sau dau dai/,["triceps_long"],["triceps_lat"]],
+ [/push ?down|pressdown|kick ?back tricep|tricep kick/,["triceps_lat"],["triceps_long"]],
+ [/tricep|close grip|tay sau/,["triceps_long","triceps_lat"],["chest","delt_front"]],
+ [/leg curl|hamstring curl|nordic|lying curl|seated curl|dui sau/,["ham_out","ham_in"],["glutes_max","gastro"]],
+ [/romanian|\brdl\b|stiff|good ?morning/,["ham_out","ham_in","glutes_max"],["erector","glutes_med"]],
+ [/deadlift|rack pull|hex bar|keo dat/,["ham_out","ham_in","glutes_max","erector"],["lats","rhomboid","traps","forearm_f","forearm_e","quad_vl","quad_vm"]],
+ [/abduct|clam|side lying leg|mong nho/,["glutes_med"],["glutes_max"]],
+ [/hip thrust|glute|kick ?back|donkey|\bmong\b/,["glutes_max"],["glutes_med","ham_out","ham_in"]],
+ [/adduct|inner thigh|dui trong/,["adductors"],[]],
+ [/seated calf|soleus/,["soleus"],["gastro"]],
+ [/calf|calves|bap chan/,["gastro","soleus"],[]],
+ [/leg extension|sissy|dui truoc/,["quad_rf","quad_vl","quad_vm"],[]],
+ [/squat|leg press|hack|lunge|step ?up|day chan|ganh/,["quad_rf","quad_vl","quad_vm","glutes_max"],["ham_out","ham_in","adductors","glutes_med"]],
+ [/back extension|hyperextension|superman|lung duoi/,["erector"],["glutes_max","ham_out","ham_in"]],
+ [/\bdips?\b/,["triceps_long","triceps_lat","chest"],["delt_front"]],
+ [/hammer|reverse curl|zottman/,["brachialis"],["biceps","forearm_e"]],
+ [/curl|bicep|preacher|tay truoc/,["biceps"],["brachialis","forearm_f"]],
+ [/face pull|rear delt|reverse fl|vai sau/,["delt_rear"],["rotator","rhomboid","traps"]],
+ [/front raise/,["delt_front"],["delt_side"]],
+ [/upright/,["delt_side","traps"],["delt_front"]],
+ [/lateral|side raise|\bvai\b/,["delt_side"],[]],
+ [/overhead press|military|shoulder press|\bohp\b|push press|arnold/,["delt_front","delt_side"],["triceps_long","triceps_lat","traps","serratus"]],
+ [/shrug/,["traps"],["forearm_f"]],
+ [/pull ?up|chin ?up|pulldown|pull down|xa don|keo xa/,["lats"],["biceps","brachialis","rotator","rhomboid","forearm_f"]],
+ [/row|\blung\b/,["lats","rhomboid"],["traps","delt_rear","biceps","rotator","erector"]],
+ [/pullover/,["lats"],["chest","triceps_long","serratus"]],
+ [/serratus|scap/,["serratus"],[]],
+ [/bench|chest|\bpec|\bfly|flye|crossover|push ?up|incline|decline|nguc|hit dat/,["chest"],["delt_front","triceps_long","triceps_lat","serratus"]],
+ [/twist|side bend|woodchop|oblique|side plank|bung cheo/,["obliques"],["abs"]],
+ [/crunch|sit ?up|plank|leg raise|knee raise|ab wheel|rollout|bung|\bcore\b|mountain climber/,["abs"],["obliques","serratus"]]
 ];
 const cls=n=>{const t=norm(n);return RU.find(r=>r[0].test(t))||null};
 function muscles(){
@@ -221,19 +237,52 @@ function muscles(){
 function muscleV(){
  const{m,un}=muscles();MM=m;
  const keys=Object.keys(MU).sort((a,b)=>m[a]-m[b]),any=keys.some(k=>m[k]>0);
- const Z=(k,sh)=>`<g class="mz m${lvl(m[k])}" data-a="mz" data-m="${k}">${sh}<title>${MU[k]}</title></g>`;
- const E=(x,y,rx,ry)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}"/>`;
- const base=`<circle cx="100" cy="18" r="12" class="bs"/><rect x="94" y="30" width="12" height="10" class="bs"/><rect x="72" y="40" width="56" height="84" rx="16" class="bs"/>`;
- const sh=Z("shoulders",E(64,50,12,10)+E(136,50,12,10)),fa=Z("forearms",E(45,112,7,17)+E(155,112,7,17));
- const front=base+Z("chest",E(84,62,16,12)+E(116,62,16,12))+Z("abs",`<rect x="88" y="78" width="24" height="42" rx="8"/>`)+Z("quads",E(86,152,13,30)+E(114,152,13,30))+Z("calves",E(85,203,9,18)+E(115,203,9,18))+sh+Z("biceps",E(52,78,8,16)+E(148,78,8,16))+fa;
- const back=base+Z("back",`<polygon points="100,34 80,48 100,72 120,48"/><polygon points="76,56 98,74 98,98 84,96 76,76"/><polygon points="124,56 102,74 102,98 116,96 124,76"/>`)+Z("lowerback",`<rect x="90" y="100" width="20" height="18" rx="5"/>`)+Z("glutes",E(87,131,14,12)+E(113,131,14,12))+Z("hamstrings",E(86,167,12,24)+E(114,167,12,24))+Z("calves",E(85,206,9,17)+E(115,206,9,17))+sh+Z("triceps",E(52,78,8,16)+E(148,78,8,16))+fa;
- const need=keys.filter(k=>lvl(m[k])<=2);
+ const Z=(k,sh)=>`<g class="mz m${lvl(m[k],k)}" data-a="mz" data-m="${k}">${sh}<title>${MU[k]}</title></g>`;
+ const P=d=>`<path d="${d}"/>`,Mi=s=>s+`<g transform="translate(230,0) scale(-1,1)">${s}</g>`;
+ const base=`<circle cx="115" cy="24" r="14" class="bs"/><rect x="106" y="36" width="18" height="20" class="bs"/><path class="bs" d="M115,54 L84,60 C74,62 70,72 71,86 L77,130 L83,172 L88,196 L115,202 L142,196 L147,172 L153,130 L159,86 C160,72 156,62 146,60Z"/>`+Mi(`<path class="bs" d="M72,64 C58,62 48,72 47,90 L46,130 L41,170 L39,186 L52,188 L58,160 L64,132 L68,100 L74,80Z"/><ellipse class="bs" cx="45" cy="197" rx="7" ry="10"/><path class="bs" d="M84,176 L115,184 L114,230 L111,292 L111,330 L103,388 L90,388 L86,330 L86,292 L82,230Z"/><ellipse class="bs" cx="95" cy="397" rx="10" ry="6"/>`);
+ const frontM=
+  Z("neck",P("M105,38 L125,38 L127,56 L115,62 L103,56Z"))+
+  Z("traps",Mi(P("M101,52 L88,57 L72,64 L84,53 L98,46Z")))+
+  Z("chest",Mi(P("M82,68 C92,64 106,66 114,70 L114,100 C104,104 92,102 85,96 C80,88 80,76 82,68Z")))+
+  Z("serratus",Mi(P("M80,100 L88,104 L86,110 L79,106Z")+P("M80,111 L88,115 L86,121 L79,117Z")+P("M81,122 L88,126 L87,131 L81,128Z")))+
+  Z("abs",Mi(`<rect x="106" y="104" width="8" height="12" rx="3"/><rect x="106" y="118" width="8" height="12" rx="3"/><rect x="106" y="132" width="8" height="12" rx="3"/><rect x="106" y="146" width="8" height="16" rx="3"/>`))+
+  Z("obliques",Mi(P("M90,106 L103,106 L103,164 C96,164 90,152 87,140 C86,128 87,116 90,106Z")))+
+  Z("delt_front",Mi(P("M80,66 C74,62 68,64 64,70 L66,88 C72,86 78,82 82,76Z")))+
+  Z("delt_side",Mi(P("M64,70 C58,66 52,70 50,78 C49,85 50,91 52,94 L66,88Z")))+
+  Z("biceps",Mi(P("M57,92 L66,90 C68,102 67,114 63,126 L57,126 C55,114 55,102 57,92Z")))+
+  Z("brachialis",Mi(P("M50,100 L56,98 C57,108 57,118 56,126 L50,126 C49,116 49,108 50,100Z")))+
+  Z("forearm_f",Mi(P("M63,130 L50,130 C46,146 44,164 42,184 L51,186 C56,170 60,150 63,130Z")))+
+  Z("adductors",Mi(P("M105,186 L114,184 L112,220 L104,204Z")))+
+  Z("quad_vl",Mi(P("M84,182 L95,186 L96,284 L89,284 C86,260 83,222 84,182Z")))+
+  Z("quad_rf",Mi(P("M95,186 C99,184 102,184 104,186 L104,282 L96,284Z")))+
+  Z("quad_vm",Mi(P("M104,206 L111,224 C113,246 112,266 108,284 L104,284Z")))+
+  Z("tibialis",Mi(P("M90,300 L98,300 C99,330 97,360 94,384 L90,384 C88,350 88,320 90,300Z")))+
+  Z("gastro",Mi(P("M99,296 L109,296 C111,320 109,345 104,364 L99,364 C100,340 100,318 99,296Z")))+
+  Z("soleus",Mi(P("M86,310 L90,310 C88,330 88,350 91,368 L88,368 C85,350 84,330 86,310Z")));
+ const backM=
+  Z("traps",P("M115,42 L103,46 L85,56 L74,64 L92,76 L106,88 L115,102 L124,88 L138,76 L156,64 L145,56 L127,46Z"))+
+  Z("rhomboid",Mi(P("M98,84 L108,90 L108,106 L98,102Z")))+
+  Z("rotator",Mi(P("M80,72 L96,80 L98,94 L82,96 L79,88Z")))+
+  Z("lats",Mi(P("M82,96 L98,100 L104,112 L104,148 C98,156 94,158 92,156 C86,138 82,118 82,96Z")))+
+  Z("erector",Mi(P("M104,110 L115,108 L115,166 L104,166Z")))+
+  Z("delt_rear",Mi(P("M76,66 C64,60 53,66 52,80 L54,94 L70,90 C73,82 76,74 76,66Z")))+
+  Z("triceps_long",Mi(P("M57,92 L66,90 C67,104 65,118 62,128 L57,128 C56,114 56,102 57,92Z")))+
+  Z("triceps_lat",Mi(P("M50,96 L57,92 C57,106 57,118 57,128 L51,128 C49,118 49,106 50,96Z")))+
+  Z("forearm_e",Mi(P("M63,132 L50,132 C46,148 44,166 42,184 L51,186 C56,170 60,152 63,132Z")))+
+  Z("glutes_max",Mi(P("M85,178 L92,183 L106,178 L115,182 L115,208 C106,216 92,214 86,204 C82,196 82,186 85,178Z")))+
+  Z("glutes_med",Mi(P("M86,168 C92,160 100,160 106,164 L106,178 L92,183 L85,177Z")))+
+  Z("ham_out",Mi(P("M84,212 L98,216 C98,240 98,262 96,284 L89,284 C86,260 83,236 84,212Z")))+
+  Z("ham_in",Mi(P("M98,216 L112,212 C113,240 112,264 108,284 L96,284 C98,262 98,240 98,216Z")))+
+  Z("gastro",Mi(P("M88,296 L108,296 C110,322 106,346 101,360 L95,360 C90,346 86,322 88,296Z")))+
+  Z("soleus",Mi(P("M90,360 L102,360 C102,372 100,382 98,388 L92,388 C91,378 90,368 90,360Z")));
+ const front=base+frontM,back=base+backM;
+ const need=keys.filter(k=>lvl(m[k],k)<=2).slice(0,6);
  return `<div class="card"><div class="row sp"><b>Nhóm cơ đã tập</b><span class="row"><button class="${mp===7?"pri":""}" data-a="mp" data-v="7">7 ngày</button><button class="${mp===28?"pri":""}" data-a="mp" data-v="28">28 ngày</button></span></div>
  <div class="mu">Số set mỗi tuần cho từng nhóm cơ. Bài chính tính 1 set, bài phụ tính 0,5 set. Bấm vào cơ để xem số liệu.</div>
- <svg viewBox="0 0 420 248" class="mm" role="img" aria-label="Mô hình các nhóm cơ đã tập"><g>${front}</g><g transform="translate(220,0)">${back}</g><text x="100" y="242" text-anchor="middle" font-size="12" fill="var(--mu)">Mặt trước</text><text x="320" y="242" text-anchor="middle" font-size="12" fill="var(--mu)">Mặt sau</text></svg>
+ <svg viewBox="30 0 400 424" class="mm" role="img" aria-label="Mô hình các nhóm cơ đã tập"><g>${front}</g><g transform="translate(230,0)">${back}</g><text x="115" y="420" text-anchor="middle" font-size="12" fill="var(--mu)">Mặt trước</text><text x="345" y="420" text-anchor="middle" font-size="12" fill="var(--mu)">Mặt sau</text></svg>
  <div id="mi" class="mu" style="min-height:20px">${any?"":"Chưa có buổi tập nào trong kỳ này."}</div>
- ${keys.map(k=>`<div class="row sp" style="margin-top:4px"><span><i class="dot m${lvl(m[k])}"></i>${MU[k]}</span><span class="mu">${f1(m[k])} set/tuần · ${SL[lvl(m[k])]}</span></div>`).join("")}
- <div class="mu" style="margin-top:8px">Mốc tham khảo: dưới 5 set/tuần là thiếu nhiều, 5–9 hơi thiếu, 10–20 đủ để tăng cơ, trên 20 là nhiều. Đây là mốc phổ biến, không phải quy tắc cứng.</div>
+ <details style="margin-top:8px"><summary><b>Chi tiết từng nhóm cơ (${keys.length})</b></summary> ${keys.map(k=>`<div class="row sp" style="margin-top:4px"><span><i class="dot m${lvl(m[k],k)}"></i>${MU[k]}</span><span class="mu">${f1(m[k])} set/tuần · ${SL[lvl(m[k],k)]}</span></div>`).join("")}</details>
+ <div class="mu" style="margin-top:8px">Mốc tham khảo: với cơ lớn, dưới 5 set/tuần là thiếu nhiều, 5–9 hơi thiếu, 10–20 đủ để tăng cơ, trên 20 là nhiều. Vì bản đồ chia nhỏ từng đầu cơ nên mốc được hạ xuống (khoảng 3 / 6 / 12 set cho cơ nhỏ như đầu vai, đầu tay sau, đùi; thấp hơn nữa cho cổ, cẳng tay, cơ cánh tay). Đây là mốc phổ biến, không phải quy tắc cứng.</div>
  ${un.length?`<div class="mu" style="margin-top:6px">Chưa nhận diện được nhóm cơ của: ${un.map(esc).join(", ")}. Hãy đặt tên theo cách gọi phổ biến, ví dụ Bench Press hoặc Đẩy ngực.</div>`:""}</div>
  ${any?`<div class="card"><b>${need.length?"Nên bổ sung":"Đã đủ khối lượng"}</b>${need.length?need.map(k=>`<div class="mt"><b>${MU[k]}</b> <span class="mu">(${f1(m[k])} set/tuần)</span><br>Gợi ý: ${SUG[k].join(", ")}</div>`).join(""):`<div class="mu">Mọi nhóm cơ đều đạt từ 10 set/tuần trong kỳ này.</div>`}</div>`:""}`;
 }
@@ -262,7 +311,7 @@ setInterval(tick,500);
 document.addEventListener("click",ev=>{
  const b=ev.target.closest("[data-a]");if(!b)return;
  const a=b.dataset.a,e=+b.dataset.e,s=+b.dataset.s,id=b.dataset.id;
- if(a==="gsign"){gsign();return}if(a==="mz"){const k=b.dataset.m;$("#mi").textContent=MU[k]+": "+f1(MM[k])+" set/tuần · "+SL[lvl(MM[k])];return}if(a==="exp"){exp();return}if(a==="imp"){$("#imp").click();return}if(a==="day"){const o=days[b.dataset.k],p=b.dataset.k.split("-");$("#hi").textContent=p[2]+"/"+p[1]+"/"+p[0]+" · "+(o?o.p.join(", ")+" · "+fmt(o.v)+" kg":"Không tập");return}
+ if(a==="gsign"){gsign();return}if(a==="mz"){const k=b.dataset.m;$("#mi").textContent=MU[k]+": "+f1(MM[k])+" set/tuần · "+SL[lvl(MM[k],k)];return}if(a==="exp"){exp();return}if(a==="imp"){$("#imp").click();return}if(a==="day"){const o=days[b.dataset.k],p=b.dataset.k.split("-");$("#hi").textContent=p[2]+"/"+p[1]+"/"+p[0]+" · "+(o?o.p.join(", ")+" · "+fmt(o.v)+" kg":"Không tập");return}
  if(a==="r15"){act.rest.end+=15000;pAct();tick();return}
  if(a==="rskip"){adv();return}
  if(a==="mp"){mp=+b.dataset.v}else if(a==="hr"){hr=b.dataset.v;ho=0}else if(a==="ho"){ho=Math.min(0,ho+(+b.dataset.d))}else if(a==="new"){edit={id:null,name:"",ex:[{name:"",rest:90,sets:[{r:10,w:0}]}]}}
@@ -327,6 +376,8 @@ function ginit(){
 }
 function gsign(){
  if(CLIENT_ID.startsWith("DÁN")){toast("Chưa dán Client ID vào file. Xem hướng dẫn.");return}
+ if(location.protocol==="file:"){alert("Không thể đăng nhập khi mở file trực tiếp từ máy. Hãy mở bằng link https://… của GitHub Pages.");return}
+ if(/FBAN|FBAV|Zalo|Instagram|Messenger|Line\/|; wv\)/i.test(navigator.userAgent)){alert("Google chặn đăng nhập trong trình duyệt của ứng dụng (Zalo, Facebook, Messenger…). Hãy mở link bằng Chrome hoặc Safari.");return}
  ginit();if(!tc){toast("Chưa tải được thư viện Google. Kiểm tra mạng hoặc trình chặn quảng cáo.");return}
  if(tok&&Date.now()<tx){sync();return}
  tc.requestAccessToken({prompt:""});
