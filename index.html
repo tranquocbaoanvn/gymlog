@@ -371,7 +371,7 @@ R();
 function ginit(){
  if(tc||CLIENT_ID.startsWith("DÁN")||!window.google||!google.accounts)return;
  tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:"https://www.googleapis.com/auth/drive.file",
-  callback:r=>{if(r&&r.access_token){tok=r.access_token;tx=Date.now()+((+r.expires_in||3600)-60)*1000;try{localStorage.setItem("gymlog2g","1")}catch(e){}syncMsg="Đang đồng bộ…";hdr();sync()}else{syncMsg="Đăng nhập chưa thành công";hdr()}},
+  callback:r=>{if(r&&r.access_token&&!google.accounts.oauth2.hasGrantedAllScopes(r,"https://www.googleapis.com/auth/drive.file")){tok=null;syncMsg="Chưa cấp quyền Drive. Bấm Đăng nhập Google lại và tick ô cho phép Drive";hdr();return}if(r&&r.access_token){tok=r.access_token;tx=Date.now()+((+r.expires_in||3600)-60)*1000;try{localStorage.setItem("gymlog2g","1")}catch(e){}syncMsg="Đang đồng bộ…";hdr();sync()}else{syncMsg="Đăng nhập chưa thành công";hdr()}},
   error_callback:()=>{syncMsg="Bấm “Đăng nhập Google” để kết nối";hdr()}});
 }
 function gsign(){
@@ -385,7 +385,7 @@ function gsign(){
 async function gf(u,o={}){
  const r=await fetch(u,{...o,headers:{Authorization:"Bearer "+tok,...(o.headers||{})}});
  if(r.status===401){tok=null;throw new Error("auth")}
- if(!r.ok)throw new Error("http "+r.status);return r;
+ if(!r.ok){let m="";try{const j=await r.clone().json();m=(j.error&&(j.error.message||j.error.status))||"";const rs=j.error&&j.error.errors&&j.error.errors[0]&&j.error.errors[0].reason;if(rs)m+=" ["+rs+"]"}catch(e){}throw new Error("http "+r.status+": "+m)}return r;
 }
 function merge(r){
  if(!r||typeof r!=="object")return;
@@ -408,7 +408,7 @@ async function sync(){
   syncMsg="Đã đồng bộ lúc "+new Date().toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"});
  }catch(e){
   if(/http 40[34]/.test(e.message)&&fid){fid=null;try{localStorage.removeItem("gymlog2fid")}catch(x){}busy=false;return sync()}
-  syncMsg=e.message==="auth"?"Cần đăng nhập Google":"Lỗi đồng bộ, sẽ thử lại sau";
+  const em=String(e.message||e);console.warn("sync error:",em);syncMsg=em==="auth"?"Cần đăng nhập Google":/accessNotConfigured|has not been used|disabled|SERVICE_DISABLED/i.test(em)?"Chưa bật Google Drive API trong Google Cloud (xem hướng dẫn)":/insufficient|scope/i.test(em)?"Chưa cấp quyền Drive. Bấm Đăng nhập Google lại và tick ô cho phép Drive":/Failed to fetch|NetworkError/i.test(em)?"Mất kết nối mạng, sẽ thử lại sau":"Lỗi đồng bộ: "+em.slice(0,90);
  }
  busy=false;(act||edit||fin)?hdr():R();if(again){again=false;sync()}
 }
